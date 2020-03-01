@@ -11,7 +11,7 @@ import (
 
 func main() {
 	d := db.New()
-	// db.AutoMigrate(d)
+	db.AutoMigrate(d)
 
 	start := time.Now()
 	commandCount := scraper.RunGCODEScraper(d)

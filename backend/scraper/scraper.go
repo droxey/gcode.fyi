@@ -4,14 +4,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/droxey/gcode.fyi/backend/models"
 	"github.com/droxey/gcode.fyi/backend/utils"
 
 	"github.com/gocolly/colly"
 	"github.com/jinzhu/gorm"
 )
-
-const titleSeparator = ":"
-const minLength = 3
 
 // RunGCODEScraper TODO
 func RunGCODEScraper(db *gorm.DB) int {
@@ -33,29 +31,22 @@ func RunGCODEScraper(db *gorm.DB) int {
 
 	c.OnHTML("#mw-content-text > div > h4", func(e *colly.HTMLElement) {
 		title := e.DOM.Find("span").Text()
-		codeDescription := strings.Split(title, titleSeparator)[0]
-		codeDescription = strings.Split(codeDescription, " ")
-		code := codeDescription[0]
-		desc := codeDescription[1]
 
-		isValidCommand := (len(code) >= minLength) && (strings.HasPrefix(code, "M") || strings.HasPrefix(code, "G"))
-		if !isValidCommand {
-			return
+		// Title text contains the GCODE command and a short description
+		// of the command, separated by a colon (`:`).
+		// May contain multiple commands separated by an ampersand (`&`).
+		commands := utils.FindGCODEInString(title)
+
+		// Iterate over all found commands.
+		for _, code := range commands {
+			// Create a Command instance to store the data.
+			commandModel := &models.Command{}
+			commandModel.Code = code
+			commandModel.SourceURL = e.Request.URL.String()
+			commandModel.ShortDescription = strings.TrimSpace(strings.Replace(strings.Replace(strings.Replace(title, code, "", 1), ": ", "", 1), " & ", "", 1))
+			commandCount = commandCount + 1
+			utils.Debug(commandModel.Code + ": " + commandModel.ShortDescription)
 		}
-		utils.Debug(code)
-		// e.ForEach("#mw-content-text > div > h4", func(_ int, el *colly.HTMLElement) {
-
-		// 	if !strings.HasPrefix(cmdTitle, "G") || !strings.HasPrefix(cmdTitle, "M") {
-		// 		return
-		// 	}
-
-		// 	// cmd := &models.Command{}
-		// 	// cmd.Firmware = "Marlin"
-		// 	// cmd.Version = "1.1.9-bugfix"
-		// 	// cmd.SourceURL = e.Request.URL.String()
-		// 	// db.FirstOrCreate(&cmd)
-		// 	// commandCount++
-		// })
 	})
 
 	// Handle any errors that occur.
@@ -63,6 +54,7 @@ func RunGCODEScraper(db *gorm.DB) int {
 		utils.CheckError(err)
 	})
 
+	// Start scraping.
 	c.Visit("https://reprap.org/wiki/G-code")
 
 	return commandCount
