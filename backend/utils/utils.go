@@ -21,25 +21,24 @@ func CheckError(err error) {
 
 // FindGCODEInString returns all instances of valid commands within any string.
 func FindGCODEInString(str string) []string {
+	// Filter out CNC commands.
+	if strings.Contains(str, "CNC") {
+		return nil
+	}
+
+	// Find the GCODE command(s) in the string via regex.
 	var matches []string
 	var re = regexp.MustCompile(`(?m)[MG]\d{1,3}`)
-
 	for _, match := range re.FindAllString(str, -1) {
-		if isValidGCODE(match) {
-			matches = append(matches, match)
-		}
+		matches = append(matches, match)
 	}
 	return matches
-}
-
-func isValidGCODE(code string) bool {
-	return (len(code) >= 2) && !strings.Contains(code, ".") && (strings.HasPrefix(code, "G") || strings.HasPrefix(code, "M"))
 }
 
 // ShowSummary prints a summary to stdout after scraping.
 func ShowSummary(start time.Time, count int) {
 	fmt.Println(
-		Sprintf("%s %d GCODE commands found in %2.2f seconds and saved to the database.",
+		Sprintf("%s %d 3d printer GCODE commands found in %2.2f seconds. Records saved in database.",
 			Inverse("[DONE]").Bold(),
 			Green(count).Bold(),
 			Green(time.Now().Sub(start).Seconds()).Bold()))
