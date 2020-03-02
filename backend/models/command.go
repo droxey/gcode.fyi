@@ -8,26 +8,55 @@ import (
 
 // Command TODO...
 type Command struct {
+	// Ignore fields with gorm:"-" specified in struct tag.
+	// Prevents duplicate columns.
 	gorm.Model
-	CreatedAt time.Time `json:"created"` // Auto-updated by GORM.
-	UpdatedAt time.Time `json:"updated"` // Auto-updated by GORM.
-	DeletedAt time.Time `json:"deleted"` // Auto-updated by GORM.
+	Code             string      `gorm:"unique_index" json:"code"`
+	Name             string      `json:"name"`
+	Description      string      `json:"description"`
+	SourceURL        string      `json:"source"`
+	DocumentationURL string      `json:"documentationUrl"`
+	Firmwares        []Firmware  `gorm:"foreignkey:CommandRefer"`
+	Parameter        []Parameter `gorm:"foreignkey:ParameterRefer"`
+	CreatedAt        time.Time   `gorm:"-" json:"created"`
+	UpdatedAt        time.Time   `gorm:"-" son:"updated"`
+	DeletedAt        time.Time   `gorm:"-" json:"deleted"`
+}
 
-	Code             string `selector:"div.usage code" json:"code"`
-	ShortDescription string `selector:"div.meta h1" json:"shortDescription"`
-	LongDescription  string `selector:"" json:"longDescription"`
+// Firmware TODO...
+type Firmware struct {
+	gorm.Model
+	Name             string    `json:"name"`
+	RepRapWikiURL    string    `json:"repRapWikiUrl"`
+	DocumentationURL string    `json:"documentationUrl"`
+	Features         []Feature `gorm:"foreignkey:FirmwareRefer"`
+	CreatedAt        time.Time `gorm:"-" json:"created"`
+	UpdatedAt        time.Time `gorm:"-" son:"updated"`
+	DeletedAt        time.Time `gorm:"-" json:"deleted"`
+}
 
-	FirmwareSupport []struct {
-		Firmware  string `selector:"" json:"firmware"`
-		Supported string `selector:"" json:"supported"`
-	}
+// Parameter TODO...
+type Parameter struct {
+	gorm.Model
+	Command      Command   `gorm:"foreignkey:CommandRefer" json:"command"`
+	CommandRefer uint      // Foreign key to Command
+	Parameter    string    `json:"parameter"`
+	Description  string    `json:"description"`
+	CreatedAt    time.Time `gorm:"-" json:"created"`
+	UpdatedAt    time.Time `gorm:"-" son:"updated"`
+	DeletedAt    time.Time `gorm:"-" json:"deleted"`
+}
 
-	SourceURL        string `json:"source"`
-	DocumentationURL string `json:"documentationUrl"`
-	Usage            []struct {
-		Example       string `selector:"div.params table td.arg code" json:"example"`
-		ExampleText   string `selector:"div.params table td:nth-child(2) p:first" json:"exampleText"`
-		Parameter     string `selector:"div.params table td:nth-child(2) ul > li > code" json:"parameter"`
-		ParameterText string `selector:"div.params table td:nth-child(2) ul > li > p" json:"parameterText"`
-	}
+// Feature TODO...
+type Feature struct {
+	gorm.Model
+	Command       Command   `gorm:"foreignkey:CommandRefer" json:"command"`
+	Firmware      Firmware  `gorm:"foreignkey:FeatureRefer" json:"firmware"`
+	CommandRefer  uint      // Foreign key to Command
+	FirmwareRefer uint      // Foreign key to Firmware
+	Supported     string    `gorm:"default:'Unknown'" json:"supported"`
+	Notes         string    `json:"notes"`
+	CreatedAt     time.Time `gorm:"-" json:"created"`
+	UpdatedAt     time.Time `gorm:"-" son:"updated"`
+	DeletedAt     time.Time `gorm:"-" json:"deleted"`
 }

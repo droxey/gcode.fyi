@@ -9,14 +9,32 @@ import (
 	. "github.com/logrusorgru/aurora"
 )
 
+const debug = true
+
+// Debug TODO...
 func Debug(msg string) {
-	fmt.Println(Sprintf("%s %s", White("[DEBUG]").BgGray(8-1), Blue(msg)))
+	if debug {
+		fmt.Println(Sprintf("%s   %s", White("[DEBUG]").BgGray(8-1), Blue(msg)))
+	}
 }
 
+// CheckError TODO..
 func CheckError(err error) {
 	if err != nil {
-		fmt.Println(Sprintf("%s %s", White("[ERROR]").BgRed(), White(err)))
+		fmt.Println(Sprintf("%s   %s", White("[ERROR]").BgRed(), White(err)))
 	}
+}
+
+// Find takes a slice and looks for an element in it. If found it will
+// return it's key, otherwise it will return -1 and a bool of false.
+// https://golangcode.com/check-if-element-exists-in-slice/
+func Find(slice []string, val string) (int, bool) {
+	for i, item := range slice {
+		if item == val {
+			return i, true
+		}
+	}
+	return -1, false
 }
 
 // FindGCODEInString returns all instances of valid commands within any string.
