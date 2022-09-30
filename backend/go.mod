@@ -11,16 +11,15 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gocolly/colly v1.2.0
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
-	github.com/gosimple/slug v1.9.0
 	github.com/jinzhu/gorm v1.9.12
 	github.com/kennygrant/sanitize v1.2.4 // indirect
-	github.com/labstack/echo/v4 v4.1.14
-	github.com/labstack/gommon v0.3.0
+	github.com/labstack/echo/v4 v4.9.0
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/logrusorgru/aurora v0.0.0-20200102142835-e9ef32dff381
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca // indirect
-	github.com/stretchr/testify v1.4.0
 	github.com/temoto/robotstxt v1.1.1 // indirect
+	golang.org/x/sync v0.0.0-20220929204114-8fcdb60fdcc0 // indirect
+	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0
 )
